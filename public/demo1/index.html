@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DDAMISE 2022</title>
+
+  <link rel="stylesheet" href="assets/leaflet.css">
+  <!-- custom css -->
+  <link rel="stylesheet" href="assets/style.css">
+
+</head>
+
+<body>
+
+  <div id="loading">
+    Cargando...
+  </div>
+
+  <div id="login">
+    <form>
+      <p>
+        Ingrese su nombre para poder ingresar a la plataforma
+      </p>
+      <input type="text" id="name" required="required" placeholder="John Doe" />
+      <input type="submit" value="Registrar" />
+    </form>
+  </div>
+
+  <div id="map">
+
+  </div>
+
+  <!-- loading scripts -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <!-- realtime database -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+  <!-- analytics -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-analytics.js"></script>
+  <!-- performance -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-performance.js"></script>
+
+  <!--custom -->
+  <script src="assets/jquery.min.js"></script>
+  <script src="assets/leaflet.min.js"></script>
+  <script src="assets/scripts.js"></script>
+
+</body>
+
+</html>
