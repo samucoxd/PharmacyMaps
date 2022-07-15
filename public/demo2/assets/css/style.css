@@ -50,7 +50,7 @@ body.dragging, body.dragging * {
     position: relative;
     float: left;
     display: block;
-    width: 50%;
+    width: 33%;
     height: 40px;
     margin: 0px;
     cursor: pointer;
@@ -60,6 +60,10 @@ body.dragging, body.dragging * {
 
 .col-md-3 div.buttons button#calc {
     background-color: #4CAF50;
+}
+
+.col-md-3 div.buttons button#todos {
+    background-color: hwb(342 30% 31%);
 }
 
 .col-md-3 div.buttons button#print {
