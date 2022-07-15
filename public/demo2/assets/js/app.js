@@ -1,4 +1,4 @@
-/* var items = [
+var items = [
     {
         id: "C11253",
         rol: "Vendedor",
@@ -80,9 +80,7 @@
         totalPedidos:10
     },
 ];
- */
 
-var items = null;
 
 var markers = Array();
 
@@ -96,22 +94,13 @@ var map = null;
 
 var poligono = Array();
 var firstCircle = null;
-var response2 = null;
-var url = 'https://terbol.info/ServicioMod04/api/actividad?parameters.id_usuario=1&parameters.fecha_ini=01%2F01%2F2022&parameters.fecha_fin=15%2F07%2F2022';
+
+
 
 $(document).ready(function () {
-/*     console.log(items.data.oActividad.length);
-
-    for (let index = 0; index < items.length; index++) {
-        
-        console.log(items[index].oUsuario[0].nombre);
-        
-    } */
-
     console.log("Start App");
     loadMap();
-    getDataAsync();
-
+    loadItems();
 
     $("ol li").click(function(){
         console.log($(this).attr("id"));
@@ -132,7 +121,10 @@ $(document).ready(function () {
         });
     });
 
-
+    $("#todos").click(function(event){
+        drawMarkersAllVendedor(items);
+        event.preventDefault();
+    });
 
 });
 
@@ -142,7 +134,7 @@ function renumerateItems() {
     });
 }
 
-function loadItems(fetchedData) {
+function loadItems() {
 
     $(".items .list").html("");
 
@@ -160,25 +152,22 @@ function loadItems(fetchedData) {
         li.append(index);
         div.html("[" + items[i].code + "] " + items[i].name);
         li.append(div);
-        $(".items .list").append(li);dmso
+        $(".items .list").append(li);
     } */
-
-        items = fetchedData.data.oActividad;
-
         for (let i = 0; i < items.length; i++) {
             var li = $("<li>",{
-                id: items[i].oUsuario.id_usuario,
-                rol: "usuario",
-                nombre: items[i].oUsuario.nombre,
-                color_map: items[i].oUsuario.color_map,
-                totalPedidos: items.length
+                id: items[i].id,
+                rol: items[i].rol,
+                nombre: items[i].nombre,
+                color_map: items[i].color_map,
+                totalPedidos: items[i].totalPedidos
 
             });
         var index = $("<div>", { class: "index" });
         var div = $("<div>", { class: "text" });
         index.html((i + 1).toString());
         li.append(index);
-        div.html("[" + items[i].oCliente.id_cliente + "] " + items[i].oCliente.nombre + "(" + items[i].totalPedidos +")");
+        div.html("[" + items[i].id + "] " + items[i].nombre + "(" + items[i].totalPedidos +")");
         li.append(div);
         $(".items .list").append(li);
     }
@@ -278,22 +267,22 @@ function drawMarkersVendedor(params){
 }
 
 function drawMarkersAllVendedor(params){
-    console.log(params);
     clearMarkers();
     counter = 1;
     color_map = "";
 
     for (let i = 0; i < params.length; i++) {
-        color_map = params[i].oUsuario.color_map;
+        color_map = params[i].color_map;
         var pinImage = {
-            url: "http://www.googlemapsmarkers.com/v1/"+ params[i].oUsuario.color_map,
+            url: "http://www.googlemapsmarkers.com/v1/"+ params[i].color_map,
           };
 
+        for (let j = 0; j < params[i].pedidos.length; j++) {
 
             var marker = new google.maps.Marker({
                 position: {
-                    lat: parseFloat(params[i].oCliente.latitud),
-                    lng: parseFloat(params[i].oCliente.longitud)
+                    lat: parseFloat(params[i].pedidos[j].lat),
+                    lng: parseFloat(params[i].pedidos[j].lng)
                 },
                 label: ((counter)).toString(),
                 //animation: google.maps.Animation.DROP,
@@ -304,6 +293,7 @@ function drawMarkersAllVendedor(params){
             counter += 1;
             markers.push(marker);
             paths.push({ lat: parseFloat(params[i].pedidos[j].lat), lng: parseFloat(params[i].pedidos[j].lng) });
+        }
 
         counter = 1;
         path = new google.maps.Polyline({
@@ -408,24 +398,5 @@ function distanceBetween(point1, point2) {
 
     return Math.sqrt(a * a + b * b);
 }
-async function getDataAsync() { 
-    let fetchedData; 
-    const response = await fetch(url) 
-    .then(response => response.json()) 
-    .then(json => fetchedData = json); 
-    console.log(fetchedData.data.oActividad);
-
-    loadItems(fetchedData);
-
-    $("#todos").click(function(event){
-        drawMarkersAllVendedor(fetchedData.data.oActividad);
-        event.preventDefault();
-    });
 
 
-/* 
-    for (let index = 0; index < fetchedData.data.oActividad.length; index++) {
-        items.push(fetchedData.data.oActividad[index]);
-                
-    } */
-}
