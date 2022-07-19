@@ -97,7 +97,7 @@ var map = null;
 var poligono = Array();
 var firstCircle = null;
 var response2 = null;
-var url = 'https://terbol.info/ServicioMod04/api/actividad?parameters.id_usuario=1&parameters.fecha_ini=01%2F01%2F2022&parameters.fecha_fin=15%2F07%2F2022';
+var url = 'https://terbol.info/ServicioMod04/api/actividad?parameters.id_usuario=2&parameters.fecha_ini=01%2F01%2F2022&parameters.fecha_fin=15%2F07%2F2022';
 
 $(document).ready(function () {
 /*     console.log(items.data.oActividad.length);
@@ -178,7 +178,7 @@ function loadItems(fetchedData) {
         var div = $("<div>", { class: "text" });
         index.html((i + 1).toString());
         li.append(index);
-        div.html("[" + items[i].oCliente.id_cliente + "] " + items[i].oCliente.nombre + "(" + items[i].totalPedidos +")");
+        div.html("[" + items[i].oCliente.id_cliente + "] " + items[i].oCliente.nombre + "(" + items[i].oUsuario.usuario +")");
         li.append(div);
         $(".items .list").append(li);
     }
@@ -278,17 +278,17 @@ function drawMarkersVendedor(params){
 }
 
 function drawMarkersAllVendedor(params){
-    console.log(params);
     clearMarkers();
     counter = 1;
     color_map = "";
-
     for (let i = 0; i < params.length; i++) {
         color_map = params[i].oUsuario.color_map;
-        var pinImage = {
-            url: "http://www.googlemapsmarkers.com/v1/"+ params[i].oUsuario.color_map,
-          };
+        color_sin_numeral = color_map.substring(1);
+        console.log(color_sin_numeral);
 
+        var pinImage = {
+            url: "http://www.googlemapsmarkers.com/v1/"+color_sin_numeral,
+          };
 
             var marker = new google.maps.Marker({
                 position: {
@@ -296,14 +296,15 @@ function drawMarkersAllVendedor(params){
                     lng: parseFloat(params[i].oCliente.longitud)
                 },
                 label: ((counter)).toString(),
-                //animation: google.maps.Animation.DROP,
-                title: "[" + params[i].pedidos[j].cliente+ "] " + params[i].pedidos[j].direccion,
+                animation: google.maps.Animation.DROP,
+                title: "[" + params[i].oCliente.nombre+ "] " + params[i].oCliente.direccion,
                 icon: pinImage,
                 map: map
             });
             counter += 1;
             markers.push(marker);
-            paths.push({ lat: parseFloat(params[i].pedidos[j].lat), lng: parseFloat(params[i].pedidos[j].lng) });
+            paths.push({ lat: parseFloat(params[i].oCliente.latitud), lng: parseFloat(params[i].oCliente.longitud) });
+    }
 
         counter = 1;
         path = new google.maps.Polyline({
@@ -317,7 +318,6 @@ function drawMarkersAllVendedor(params){
 
         paths = [];
 
-    }
 
 
 
