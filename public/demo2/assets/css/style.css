@@ -50,7 +50,7 @@ body.dragging, body.dragging * {
     position: relative;
     float: left;
     display: block;
-    width: 33%;
+    width: 50%;
     height: 40px;
     margin: 0px;
     cursor: pointer;
@@ -70,8 +70,12 @@ body.dragging, body.dragging * {
     background-color: #757575;
 }
 
+.col-md-3 div.buttons button#cargar {
+    background-color: #10d7e6;
+}
+
 .col-md-3 div.items {
-    height: calc(100vh - 80px);
+    height: calc(100vh - 120px);
     overflow: auto;
     background-color: #BDBDBD;
 }

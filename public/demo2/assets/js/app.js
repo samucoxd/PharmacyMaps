@@ -82,6 +82,7 @@
 ];
  */
 
+
 var items = null;
 
 var markers = Array();
@@ -97,41 +98,22 @@ var map = null;
 var poligono = Array();
 var firstCircle = null;
 var response2 = null;
-var url = 'https://terbol.info/ServicioMod04/api/actividad?parameters.id_usuario=2&parameters.fecha_ini=01%2F01%2F2022&parameters.fecha_fin=15%2F07%2F2022';
+//var url = 'https://terbol.info/ServicioMod04/api/actividad?parameters.id_usuario=2&parameters.fecha_ini=01%2F01%2F2022&parameters.fecha_fin=15%2F07%2F2022'; GET ACTIVIDAD
+
+var url = 'https://terbol.info/ServicioMod04/api/actividad/group/by/usuario?parameters.fecha_ini=01%2F01%2F2022&parameters.fecha_fin=19%2F07%2F2022'; 
+
+
+console.log("Start App");
+loadMap();
+
+
+$("#cargar").click(function(){
+	cargarDatos();
+});
+	 
+
 
 $(document).ready(function () {
-/*     console.log(items.data.oActividad.length);
-
-    for (let index = 0; index < items.length; index++) {
-        
-        console.log(items[index].oUsuario[0].nombre);
-        
-    } */
-
-    console.log("Start App");
-    loadMap();
-    getDataAsync();
-
-
-    $("ol li").click(function(){
-        console.log($(this).attr("id"));
-        let dato = items.filter(item => item.id == $(this).attr("id").toString());
-        drawMarkersVendedor(dato);
-    
-        $("#calc").click(function (event) {
-            orderMarkers();
-            loadItems();
-            drawMarkersVendedor(items);
-            event.preventDefault();
-    
-        });
-    
-        $("#print").click(function (event) {
-            printMap();
-            event.preventDefault();
-        });
-    });
-
 
 
 });
@@ -143,42 +125,22 @@ function renumerateItems() {
 }
 
 function loadItems(fetchedData) {
+    console.log(fetchedData);
 
     $(".items .list").html("");
 
-/*     for (i = 0; i < items.length; i++) {
-        var li = $("<li>", {
-            lat: items[i].point.lat,
-            lng: items[i].point.lng,
-            code: items[i].code,
-            name: items[i].name,
-            address: items[i].address
+    for (let i = 0; i < fetchedData.length; i++) {
+        var li = $("<li>",{
+            id: fetchedData[i].id_usuario,
+            rol: "usuario",
+            nombre: fetchedData[i].nombre,
+            color_map: fetchedData[i].color_map,
         });
         var index = $("<div>", { class: "index" });
         var div = $("<div>", { class: "text" });
         index.html((i + 1).toString());
         li.append(index);
-        div.html("[" + items[i].code + "] " + items[i].name);
-        li.append(div);
-        $(".items .list").append(li);dmso
-    } */
-
-        items = fetchedData.data.oActividad;
-
-        for (let i = 0; i < items.length; i++) {
-            var li = $("<li>",{
-                id: items[i].oUsuario.id_usuario,
-                rol: "usuario",
-                nombre: items[i].oUsuario.nombre,
-                color_map: items[i].oUsuario.color_map,
-                totalPedidos: items.length
-
-            });
-        var index = $("<div>", { class: "index" });
-        var div = $("<div>", { class: "text" });
-        index.html((i + 1).toString());
-        li.append(index);
-        div.html("[" + items[i].oCliente.id_cliente + "] " + items[i].oCliente.nombre + "(" + items[i].oUsuario.usuario +")");
+        div.html("[" + fetchedData[i].nombre + " - "+ fetchedData[i].oClientes.length + "] <button type='button' id='btn-toast" + (i+1) + "' code=" + (fetchedData[i].id_usuario) + " class='btn btn-primary'>Ver</button>");
         li.append(div);
         $(".items .list").append(li);
     }
@@ -249,20 +211,20 @@ function drawMarkersVendedor(params){
     }
     for (let i = 0; i < params.length; i++) {
         color_map = params[i].color_map;
-        for (let j = 0; j < params[i].pedidos.length; j++) {
+        for (let j = 0; j < params[i].oClientes.length; j++) {
 
             var marker = new google.maps.Marker({
                 position: {
-                    lat: parseFloat(params[i].pedidos[j].lat),
-                    lng: parseFloat(params[i].pedidos[j].lng)
+                    lat: parseFloat(params[i].oClientes[j].latitud),
+                    lng: parseFloat(params[i].oClientes[j].longitud)
                 },
                 label: ((counter)).toString(),
-                title: "[" + params[i].pedidos[j].cliente+ "] " + params[i].pedidos[j].direccion,
+                title: "[" + params[i].oClientes[j].nombre+ "] " + params[i].oClientes[j].direccion,
                 map: map
             });
             counter += 1;
             markers.push(marker);
-            paths.push({ lat: parseFloat(params[i].pedidos[j].lat), lng: parseFloat(params[i].pedidos[j].lng) });
+            paths.push({ lat: parseFloat(params[i].oClientes[j].latitud), lng: parseFloat(params[i].oClientes[j].longitud) });
         }
     }
 
@@ -408,24 +370,148 @@ function distanceBetween(point1, point2) {
 
     return Math.sqrt(a * a + b * b);
 }
+
 async function getDataAsync() { 
-    let fetchedData; 
-    const response = await fetch(url) 
-    .then(response => response.json()) 
-    .then(json => fetchedData = json); 
-    console.log(fetchedData.data.oActividad);
+    return new Promise((resolve, reject) => {
+        fetch(url)
+          .then((response) => {
+            if (response.ok) {
+              return response.json();
+            }
+            reject(
+              "No hemos podido recuperar ese json. El código de respuesta del servidor es: " +
+                response.status
+            );
+          })
+          .then((json) => resolve(json))
+          .catch((err) => reject(err));
+        });
+}
 
-    loadItems(fetchedData);
+function getUsuario(argument) {
+	
+	oUsuario = argument.data.oUsuario;
+	oUsuarios = [];
+	for (var i = 0; i < oUsuario.length; i++) {
+        oClientes = getClientes(oUsuario[i].oActividad);
+		oUsuarios[i] = {
+			id_usuario : oUsuario[i].id_usuario,
+			nombre : oUsuario[i].nombre,
+			color_map : oUsuario[i].color_map,
+			usuario : oUsuario[i].usuario,
+            oClientes : oClientes
+		};
+	}
+	return oUsuarios;
+}
 
-    $("#todos").click(function(event){
-        drawMarkersAllVendedor(fetchedData.data.oActividad);
-        event.preventDefault();
+function getClientes(vendedor){
+    //console.log(vendedor.oActividad.length);
+    oClientes = [];
+    for (let i = 0; i < vendedor.length; i++) {
+        oClientes[i] = {
+            id_cliente : vendedor[i].oCliente.id_cliente,
+            nombre : vendedor[i].oCliente.nombre,
+            direccion : vendedor[i].oCliente.direccion,
+            telefono : vendedor[i].oCliente.telefono,
+            latitud : vendedor[i].oCliente.latitud,
+            longitud : vendedor[i].oCliente.longitud,
+            hora_inicial : vendedor[i].oCliente.hora_inicial,
+            hora_final : vendedor[i].oCliente.hora_final,
+        };
+    }
+    return oClientes;
+}
+
+function getCliente(vendedor){
+    //console.log(vendedor.oActividad.length);
+    oClientes = [];
+    cliente = vendedor.oClientes;
+    for (let i = 0; i < cliente.length; i++) {
+        oClientes[i] = {
+            id_cliente : cliente[i].id_cliente,
+            nombre : cliente[i].nombre,
+            direccion : cliente[i].direccion,
+            telefono : cliente[i].telefono,
+            latitud : cliente[i].latitud,
+            longitud : cliente[i].longitud,
+            hora_inicial : cliente[i].hora_inicial,
+            hora_final : cliente[i].hora_final,
+        };
+    }
+    return oClientes;
+}
+
+
+function cargarDatos() {
+      getDataAsync(url)
+      .then((json) => {
+        //console.log("el json de respuesta es:", json);
+        oUsuarios = getUsuario(json);
+        loadItems(oUsuarios);
+        toastActividad(oUsuarios);
+
+      });
+}
+
+function apuntes(){
+    getDataAsync("https://terbol.info/ServicioMod04/api/actividad/group/by/usuario?parameters.fecha_ini=01%2F01%2F2022&parameters.fecha_fin=20%2F07%2F2022")
+    .then((json) => {
+      //console.log("el json de respuesta es:", json);
+      oUsuarios = getUsuario(json);
+      loadItems(oUsuarios);
+
+    $("ol li").click(function(){
+        let dato = oUsuarios.filter(oUsuarios => oUsuarios.id_usuario == $(this).attr("id").toString());
+        console.log(dato);
+
+        drawMarkersVendedor(dato);
+    
+        $("#calc").click(function (event) {
+            orderMarkers();
+            loadItems();
+            drawMarkersVendedor(items);
+            event.preventDefault();
+    
+        });
+    
+        $("#print").click(function (event) {
+            printMap();
+            event.preventDefault();
+        });
     });
 
+    })
+    .catch((err) => {
+      console.log("Error encontrado:", err);
+    });
 
-/* 
-    for (let index = 0; index < fetchedData.data.oActividad.length; index++) {
-        items.push(fetchedData.data.oActividad[index]);
-                
-    } */
+}
+
+function toastActividad(oUsuarios) {
+		//el $ no es jquery es una convención que se utiliza para indicar que es un elemento del DOM
+	const toast = msg => {
+	    //como segundo parámetro admite opciones como: animation, autohide, delay
+        $('.toast-body').html("");
+        clientes = getCliente(msg);
+        console.log(clientes);
+        $('.toast-body').append(clientes[0].id_cliente,clientes[0].nombre);
+        $('.toast').toast('show');
+	}// toast()
+
+
+    $("ol li").each(function (index) {
+
+            $('#btn-toast' +(index+1)+ '').click(function(){
+                id = $(this).attr("code");
+                console.log(id);
+
+                var filteredNames = oUsuarios.filter((oUsuarios) => oUsuarios[index] == id);
+                console.log(oUsuarios[index]);
+                const msg = oUsuarios[index];
+                toast(msg)
+            });
+        });
+
+         
 }
