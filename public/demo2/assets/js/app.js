@@ -158,7 +158,7 @@ function drawMarkersVendedor(oUsuarios) {
     console.log(color_sin_numeral);
 
     var pinImage = {
-        url: "http://www.googlemapsmarkers.com/v1/" + color_sin_numeral,
+        url: "https://www.googlemapsmarkers.com/v1/" + color_sin_numeral,
     };
     oClientes = oUsuarios.oClientes;
     for (var j = 0; j < oClientes.length; j++) {
