@@ -18,7 +18,7 @@ body.dragging, body.dragging * {
 }
 
 .col-md-3 {
-    background-color: #FFF;
+    background-color: white;
     overflow: hidden;
     padding: 0px;
 }
@@ -33,7 +33,7 @@ body.dragging, body.dragging * {
 
 .col-md-3 div.title {
     padding: 10px;
-    background-color: #388E3C;
+    background-color: #095DD9;
     color: #FFF;
     font-weight: bold;
     text-transform: uppercase;
@@ -77,7 +77,10 @@ body.dragging, body.dragging * {
 .col-md-3 div.items {
     height: calc(100vh - 120px);
     overflow: auto;
-    background-color: #BDBDBD;
+    background-color: white;
+    background-image: url("../img/logo.jpeg");
+    background-repeat: no-repeat;
+    background-position: center;
 }
 
 ol {
@@ -97,7 +100,7 @@ ol li {
     clear: both;
     display: block;
     width: 100%;
-    background-color: #C8E6C9;
+    /*background-color: #C8E6C9;*/
     margin: 0;
     margin-top: 5px;
     cursor: pointer;
@@ -118,6 +121,20 @@ ol li div.index {
     clear: left;
 }
 
+ol li div.indice {
+    border-radius: 5px 0px 0px 5px;
+    background-color: #383c4a;
+    color: #FFF;
+    text-align: center;
+    position: relative;
+    float: left;
+    display: block;
+    padding: 5px;
+    width: 32px;
+    height: 100%;
+    clear: left;
+}
+
 ol li div.text {
     position: relative;
     float: left;
@@ -127,6 +144,17 @@ ol li div.text {
     width: calc(100% - 42px);
 }
 
+ol li div.textToast {
+    position: relative;
+    background-color: #7c818c;
+    float: left;
+    display: block;
+    padding: 5px;
+    clear: none;
+    width: calc(100% - 42px);
+}
+
+
 @media print {
     .col-md-9 {
         width: 100%;
@@ -135,4 +163,16 @@ ol li div.text {
     .col-md-3 {
         display: none;
     }
+    #toast-container {
+        display: none;
+    }
+}
+
+#toast-container {
+    background: #095DD9;
+}
+
+#toast-container > .toast {
+    max-width: 400px;
+    width: 90%;
 }
