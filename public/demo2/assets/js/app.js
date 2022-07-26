@@ -27,7 +27,7 @@ $("#cargar").click(function () {
 
 
 $(document).ready(function () {
-
+    cargarDatos();
 
 });
 
@@ -155,9 +155,16 @@ function drawMarkersVendedor(oUsuarios) {
 
     color_sin_numeral = color_map.substring(1);
 
-    var pinImage = {
+    //var pinImage = {
         url: "https://chart.apis.google.com/chart?cht=d&chdp=mapsapi&chl=pin%27i%5C%27%5B%27-2%27f%5Chv%27a%5C%5Dh%5C%5Do%5C" + color_sin_numeral + "%27fC%5C000000%27tC%5C000000%27eC%5CLauto%27f%5C&ext=.png"
-    };
+    //};
+
+    var pinColor = color_sin_numeral;
+    var pinImage = new google.maps.MarkerImage("http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|" + pinColor,
+        new google.maps.Size(21, 34),
+        new google.maps.Point(0,0),
+        new google.maps.Point(10, 34));
+
     oClientes = oUsuarios.oClientes;
     for (var j = 0; j < oClientes.length; j++) {
         var marker = new google.maps.Marker({
