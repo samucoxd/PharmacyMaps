@@ -251,7 +251,10 @@ function loadMap() {
 }
 
 function printMap() {
-    window.print();
+    $("#print").click(function () {
+        window.print();
+    });
+    
 }
 
 function orderMarkers(items) {
@@ -379,6 +382,7 @@ function cargarDatos() {
             oUsuarios = getUsuario(json);
             loadItems(oUsuarios);
             toastActividad(oUsuarios);
+            printMap();
         });
 }
 
