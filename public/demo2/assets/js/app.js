@@ -159,6 +159,8 @@ function drawMarkersVendedor(oUsuarios) {
         url: "https://chart.apis.google.com/chart?cht=d&chdp=mapsapi&chl=pin%27i%5C%27%5B%27-2%27f%5Chv%27a%5C%5Dh%5C%5Do%5C" + color_sin_numeral + "%27fC%5C000000%27tC%5C000000%27eC%5CLauto%27f%5C&ext=.png"
     //};
 
+
+
     var pinColor = color_sin_numeral;
     var pinImage = new google.maps.MarkerImage("http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|" + pinColor,
         new google.maps.Size(21, 34),
@@ -179,8 +181,19 @@ function drawMarkersVendedor(oUsuarios) {
             map: map
         });
         counter += 1;
-        markers.push(marker);
+
+        const infowindow = infoMarker(oClientes[j]);
+
+        marker.addListener("click", () => {
+            infowindow.open({
+              anchor: marker,
+              map,
+              shouldFocus: false,
+            });
+          });
         paths.push({ lat: parseFloat(oClientes[j].latitud), lng: parseFloat(oClientes[j].longitud) });
+
+
     }
     counter = 1;
     path = new google.maps.Polyline({
@@ -350,6 +363,7 @@ function getClientes(vendedor) {
             longitud: vendedor[i].oCliente.longitud,
             hora_inicial: vendedor[i].oCliente.hora_inicial,
             hora_final: vendedor[i].oCliente.hora_final,
+            foto_url: vendedor[i].oCliente.foto_url,
         };
     }
     return oClientes;
@@ -388,6 +402,7 @@ function cargarDatos() {
 
 
 function toastActividad(oUsuarios) {
+    console.log(oUsuarios);
     //el $ no es jquery es una convención que se utiliza para indicar que es un elemento del DOM
     const toast = clientes => {
         //como segundo parámetro admite opciones como: animation, autohide, delay
@@ -424,3 +439,14 @@ function agregarDistanciaCliente(cliente)
     return clientes;
 }
 
+
+function infoMarker(oCliente){
+    const contentString = new google.maps.InfoWindow({
+        content: '<div>' +
+        '<h5>' + oCliente.nombre + '</h5>' +
+        "<ol style='width:300px'><li>ID: "+ oCliente.id_cliente +"</li><li>Direccion: "+ oCliente.direccion +"</li><li>Telefono: "+ oCliente.telefono +"</li><li>Hora Inicial: "+ oCliente.hora_inicial +"</li><li>Hora Final: "+ oCliente.hora_final +"</li></ol><img src='"+oCliente.foto_url+"'width='150px' height='150px'>"
+      });
+
+
+    return contentString;
+}
