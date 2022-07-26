@@ -64,6 +64,7 @@ body.dragging, body.dragging * {
 
 .col-md-3 div.buttons button#todos {
     background-color: hwb(342 30% 31%);
+    width: 100%;
 }
 
 .col-md-3 div.buttons button#print {
