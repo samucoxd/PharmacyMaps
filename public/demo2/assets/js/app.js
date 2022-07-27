@@ -182,15 +182,16 @@ function drawMarkersVendedor(oUsuarios) {
         });
         counter += 1;
 
-        const infowindow = infoMarker(oClientes[j]);
+        var infowindow = new google.maps.InfoWindow()
+        const content = infoMarker(oClientes[j]);
+        google.maps.event.addListener(marker,'click', (function(marker,content,infowindow){ 
+            return function() {
+               infowindow.setContent(content);
+               infowindow.open(map,marker);
+            };
+        })(marker,content,infowindow)); 
 
-        marker.addListener("click", () => {
-            infowindow.open({
-              anchor: marker,
-              map,
-              shouldFocus: false,
-            });
-          });
+        markers.push(marker);
         paths.push({ lat: parseFloat(oClientes[j].latitud), lng: parseFloat(oClientes[j].longitud) });
 
 
@@ -199,7 +200,7 @@ function drawMarkersVendedor(oUsuarios) {
     path = new google.maps.Polyline({
         path: paths,
         geodesic: true,
-        strokeColor: "#" + color_map,
+        strokeColor: color_map,
         strokeOpacity: 1.0,
         strokeWeight: 2,
     });
@@ -208,34 +209,51 @@ function drawMarkersVendedor(oUsuarios) {
     paths = [];
 }
 
-function drawMarkersOrderAllVendedor(oClientes) {
+function drawMarkersOrderAllVendedor(oUsuarios) {
     clearMarkers();
-    for (var j = 0; j < oClientes.length; j++) {
-        var marker = new google.maps.Marker({
-            position: {
-                lat: parseFloat(oClientes[j].latitud),
-                lng: parseFloat(oClientes[j].longitud)
-            },
-            label: ((counter)).toString(),
-            animation: google.maps.Animation.DROP,
-            title: "[" + oClientes[j].nombre + "] " + oClientes[j].direccion,
-            map: map
-        });
-        counter += 1;
-        markers.push(marker);
-        paths.push({ lat: parseFloat(oClientes[j].latitud), lng: parseFloat(oClientes[j].longitud) });
-    }
-    counter = 1;
-    path = new google.maps.Polyline({
-        path: paths,
-        geodesic: true,
-        strokeColor: "#" + color_map,
-        strokeOpacity: 1.0,
-        strokeWeight: 2,
-    });
-    path.setMap(map);
+    for (var i = 0; i < oUsuarios.length; i++) {
 
-    paths = [];
+        color_map = oUsuarios[i].color_map;
+        console.log(color_map);
+        color_sin_numeral = color_map.substring(1);
+        var pinColor = color_sin_numeral;
+        var pinImage = new google.maps.MarkerImage("http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|" + pinColor,
+        new google.maps.Size(21, 34),
+        new google.maps.Point(0,0),
+        new google.maps.Point(10, 34));
+        counter = 1;
+        oClientes = oUsuarios[i].oClientes;
+
+        for (var j = 0; j < oClientes.length; j++) {
+            var marker = new google.maps.Marker({
+                position: {
+                    lat: parseFloat(oClientes[j].latitud),
+                    lng: parseFloat(oClientes[j].longitud)
+                },
+                label: ((counter)).toString(),
+                animation: google.maps.Animation.DROP,
+                icon: pinImage,
+                title: "[" + oClientes[j].nombre + "] " + oClientes[j].direccion,
+                map: map
+            });
+            counter += 1;
+            markers.push(marker);
+            paths.push({ lat: parseFloat(oClientes[j].latitud), lng: parseFloat(oClientes[j].longitud) });
+        }
+            path = new google.maps.Polyline({
+                path: paths,
+                geodesic: true,
+                strokeColor: "FF0000",
+                strokeOpacity: 1.0,
+                strokeWeight: 2,
+            });
+
+            marker = [];
+    }
+        path.setMap(map);
+
+        //paths = []; 
+    
 }
 
 function clearMarkers() {
@@ -397,6 +415,9 @@ function cargarDatos() {
             loadItems(oUsuarios);
             toastActividad(oUsuarios);
             printMap();
+            $("#todos").click(function () {
+                drawMarkersOrderAllVendedor(oUsuarios);
+            });
         });
 }
 
@@ -441,12 +462,8 @@ function agregarDistanciaCliente(cliente)
 
 
 function infoMarker(oCliente){
-    const contentString = new google.maps.InfoWindow({
-        content: '<div>' +
-        '<h5>' + oCliente.nombre + '</h5>' +
-        "<ol style='width:300px'><li>ID: "+ oCliente.id_cliente +"</li><li>Direccion: "+ oCliente.direccion +"</li><li>Telefono: "+ oCliente.telefono +"</li><li>Hora Inicial: "+ oCliente.hora_inicial +"</li><li>Hora Final: "+ oCliente.hora_final +"</li></ol><img src='"+oCliente.foto_url+"'width='150px' height='150px'>"
-      });
-
-
-    return contentString;
+    content = '<div>' +
+    '<h5>' + oCliente.nombre + '</h5>' +
+    "<ol style='width:300px'><li>ID: "+ oCliente.id_cliente +"</li><li>Direccion: "+ oCliente.direccion +"</li><li>Telefono: "+ oCliente.telefono +"</li><li>Hora Inicial: "+ oCliente.hora_inicial +"</li><li>Hora Final: "+ oCliente.hora_final +"</li></ol><img src='"+oCliente.foto_url+"'width='150px' height='150px'>";
+    return content;
 }
