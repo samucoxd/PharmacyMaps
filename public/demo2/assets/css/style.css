@@ -157,10 +157,10 @@ ol li div.textToast {
 
 
 @media print {
+    @page {size: landscape}
     .col-md-9 {
         width: 100%;
     }
-
     .col-md-3 {
         display: none;
     }

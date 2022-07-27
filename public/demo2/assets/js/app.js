@@ -11,20 +11,14 @@ var center = { lat: -17.783443, lng: -63.183526 };
 var map = null;
 
 var poligono = Array();
+
 var firstCircle = null;
 
-var url = 'https://terbol.info/ServicioMod04/api/actividad/group/by/usuario?parameters.fecha_ini=01%2F01%2F2022&parameters.fecha_fin=25%2F07%2F2022';
+var url = 'https://terbol.info/ServicioMod04/api/actividad/group/by/usuario?parameters.fecha_ini=01%2F01%2F2022&parameters.fecha_fin=27%2F07%2F2022';
 
 
 console.log("Start App");
 loadMap();
-
-
-$("#cargar").click(function () {
-    cargarDatos();
-});
-
-
 
 $(document).ready(function () {
     cargarDatos();
@@ -38,7 +32,6 @@ function renumerateItems() {
 }
 
 function loadItems(fetchedData) {
-    console.log(fetchedData);
 
     $(".items .list").html("");
 
@@ -47,23 +40,16 @@ function loadItems(fetchedData) {
             id: fetchedData[i].id_usuario,
             rol: "usuario",
             nombre: fetchedData[i].nombre,
-            style: 'background-color:' + fetchedData[i].color_map +'',
+            style: 'background-color:' + fetchedData[i].color_map + '',
         });
         var index = $("<div>", { class: "index" });
-        var div = $("<div>", { class: "text" });
+        var div = $("<div>", { class: "text", id: "btn-toast" + (i + 1), code: (fetchedData[i].id_usuario), });
         index.html((i + 1).toString());
         li.append(index);
-        div.html("[<i class='fa fa-solid fa-street-view'></i> Cod: " + fetchedData[i].id_usuario + " " + fetchedData[i].nombre + " - " + fetchedData[i].oClientes.length + "] <a id='btn-toast" + (i + 1) + "' code=" + (fetchedData[i].id_usuario) + "'><i class='fa fa-solid fa-eye' style='font-size:20px;'></i></a>");
+        div.html("[<i class='fa fa-solid fa-street-view'></i> Cod: " + fetchedData[i].id_usuario + " " + fetchedData[i].nombre + " - " + fetchedData[i].oClientes.length + "] <i class='fa fa-solid fa-eye' style='font-size:20px;'></i>");
         li.append(div);
         $(".items .list").append(li);
     }
-    $(".items .list").sortable({
-        onDrop: function ($item, container, _super) {
-            renumerateItems();
-            _super($item, container);
-        }
-    });
-
 
 }
 
@@ -98,162 +84,25 @@ function loadItemsClientes(clientes) {
 
 }
 
-function drawMarkers() {
-
-    clearMarkers();
-
-    $("ol li").each(function (index) {
-        var marker = new google.maps.Marker({
-            position: {
-                lat: parseFloat($(this).attr("lat")),
-                lng: parseFloat($(this).attr("lng"))
-            },
-            label: ((index + 1)).toString(),
-            title: "[" + $(this).attr("code") + "] " + $(this).attr("name") + " Dir: " + $(this).attr("address"),
-            map: map
-        });
-        markers.push(marker);
-        paths.push({ lat: parseFloat($(this).attr("lat")), lng: parseFloat($(this).attr("lng")) });
-    });
-
-    //limpiamos el circulo del mapa
-    if (firstCircle != null) {
-        firstCircle.setMap(null);
-    }
-
-    firstCircle = new google.maps.Circle({
-        strokeColor: "#FF0000",
-        strokeOpacity: 0.8,
-        strokeWeight: 2,
-        fillColor: "#FF0000",
-        fillOpacity: 0.35,
-        map: map,
-        center: {
-            lat: markers[0].position.lat(),
-            lng: markers[0].position.lng()
-        },
-        radius: 100
-    });
-
-    path = new google.maps.Polyline({
-        path: paths,
-        geodesic: true,
-        strokeColor: '#FF0000',
-        strokeOpacity: 1.0,
-        strokeWeight: 2
-    });
-
-    path.setMap(map);
-}
-
-
 function drawMarkersVendedor(oUsuarios) {
     clearMarkers();
-    counter = 1;
-    color_map = "";
     color_map = oUsuarios.color_map;
 
     color_sin_numeral = color_map.substring(1);
-
-    //var pinImage = {
-        url: "https://chart.apis.google.com/chart?cht=d&chdp=mapsapi&chl=pin%27i%5C%27%5B%27-2%27f%5Chv%27a%5C%5Dh%5C%5Do%5C" + color_sin_numeral + "%27fC%5C000000%27tC%5C000000%27eC%5CLauto%27f%5C&ext=.png"
-    //};
-
-
-
     var pinColor = color_sin_numeral;
-    var pinImage = new google.maps.MarkerImage("http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|" + pinColor,
-        new google.maps.Size(21, 34),
-        new google.maps.Point(0,0),
-        new google.maps.Point(10, 34));
 
     oClientes = oUsuarios.oClientes;
-    for (var j = 0; j < oClientes.length; j++) {
-        var marker = new google.maps.Marker({
-            position: {
-                lat: parseFloat(oClientes[j].latitud),
-                lng: parseFloat(oClientes[j].longitud)
-            },
-            label: ((counter)).toString(),
-            animation: google.maps.Animation.DROP,
-            title: "[" + oClientes[j].nombre + "] " + oClientes[j].direccion,
-            icon: pinImage,
-            map: map
-        });
-        counter += 1;
 
-        var infowindow = new google.maps.InfoWindow()
-        const content = infoMarker(oClientes[j]);
-        google.maps.event.addListener(marker,'click', (function(marker,content,infowindow){ 
-            return function() {
-               infowindow.setContent(content);
-               infowindow.open(map,marker);
-            };
-        })(marker,content,infowindow)); 
-
-        markers.push(marker);
-        paths.push({ lat: parseFloat(oClientes[j].latitud), lng: parseFloat(oClientes[j].longitud) });
-
-
-    }
-    counter = 1;
-    path = new google.maps.Polyline({
-        path: paths,
-        geodesic: true,
-        strokeColor: color_map,
-        strokeOpacity: 1.0,
-        strokeWeight: 2,
-    });
-    path.setMap(map);
-
-    paths = [];
+    dibujarMarkers(oClientes, pinColor);
 }
 
-function drawMarkersOrderAllVendedor(oUsuarios) {
+function drawMarkersOrderAllVendedor(oClientes, oUsuarios) {
     clearMarkers();
-    for (var i = 0; i < oUsuarios.length; i++) {
+    color_map = oUsuarios.color_map;
+    var pinColor = color_map.substring(1);
 
-        color_map = oUsuarios[i].color_map;
-        console.log(color_map);
-        color_sin_numeral = color_map.substring(1);
-        var pinColor = color_sin_numeral;
-        var pinImage = new google.maps.MarkerImage("http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|" + pinColor,
-        new google.maps.Size(21, 34),
-        new google.maps.Point(0,0),
-        new google.maps.Point(10, 34));
-        counter = 1;
-        oClientes = oUsuarios[i].oClientes;
+    dibujarMarkers(oClientes, pinColor);
 
-        for (var j = 0; j < oClientes.length; j++) {
-            var marker = new google.maps.Marker({
-                position: {
-                    lat: parseFloat(oClientes[j].latitud),
-                    lng: parseFloat(oClientes[j].longitud)
-                },
-                label: ((counter)).toString(),
-                animation: google.maps.Animation.DROP,
-                icon: pinImage,
-                title: "[" + oClientes[j].nombre + "] " + oClientes[j].direccion,
-                map: map
-            });
-            counter += 1;
-            markers.push(marker);
-            paths.push({ lat: parseFloat(oClientes[j].latitud), lng: parseFloat(oClientes[j].longitud) });
-        }
-            path = new google.maps.Polyline({
-                path: paths,
-                geodesic: true,
-                strokeColor: "FF0000",
-                strokeOpacity: 1.0,
-                strokeWeight: 2,
-            });
-
-            marker = [];
-    }
-        path.setMap(map);
-
-        //paths = []; 
-    
 }
 
 function clearMarkers() {
@@ -285,13 +134,10 @@ function printMap() {
     $("#print").click(function () {
         window.print();
     });
-    
+
 }
 
 function orderMarkers(items) {
-
-    console.log("orderMarkers");
-    console.log(items);
 
     var first = null;
     var others = null;
@@ -369,7 +215,6 @@ function getUsuario(argument) {
 }
 
 function getClientes(vendedor) {
-    //console.log(vendedor.oActividad.length);
     oClientes = [];
     for (let i = 0; i < vendedor.length; i++) {
         oClientes[i] = {
@@ -401,29 +246,26 @@ function getCliente(vendedor) {
             longitud: cliente[i].longitud,
             hora_inicial: cliente[i].hora_inicial,
             hora_final: cliente[i].hora_final,
+            foto_url: cliente[i].foto_url,
         };
     }
     return oClientes;
 }
 
-
 function cargarDatos() {
     getDataAsync(url)
         .then((json) => {
-            //console.log("el json de respuesta es:", json);
             oUsuarios = getUsuario(json);
             loadItems(oUsuarios);
             toastActividad(oUsuarios);
             printMap();
             $("#todos").click(function () {
-                drawMarkersOrderAllVendedor(oUsuarios);
+                drawMarkersAllClientes(oUsuarios);
             });
         });
 }
 
-
 function toastActividad(oUsuarios) {
-    console.log(oUsuarios);
     //el $ no es jquery es una convención que se utiliza para indicar que es un elemento del DOM
     const toast = clientes => {
         //como segundo parámetro admite opciones como: animation, autohide, delay
@@ -444,26 +286,108 @@ function toastActividad(oUsuarios) {
             $("#calc").click(function () {
                 clienteOrdenados = orderMarkers(clientes);
                 loadItemsClientes(clienteOrdenados);
-                drawMarkersOrderAllVendedor(clienteOrdenados);
+                drawMarkersOrderAllVendedor(clienteOrdenados, oUsuarios[index]);
             });
         });
     });
 }
 
-function agregarDistanciaCliente(cliente)
-{
+function agregarDistanciaCliente(cliente) {
     clientes = cliente;
     for (let i = 0; i < clientes.length; i++) {
         clientes[i].distance = 0;
     }
-    
+
     return clientes;
 }
 
 
-function infoMarker(oCliente){
+function infoMarker(oCliente) {
     content = '<div>' +
-    '<h5>' + oCliente.nombre + '</h5>' +
-    "<ol style='width:300px'><li>ID: "+ oCliente.id_cliente +"</li><li>Direccion: "+ oCliente.direccion +"</li><li>Telefono: "+ oCliente.telefono +"</li><li>Hora Inicial: "+ oCliente.hora_inicial +"</li><li>Hora Final: "+ oCliente.hora_final +"</li></ol><img src='"+oCliente.foto_url+"'width='150px' height='150px'>";
+        '<h5>' + oCliente.nombre + '</h5>' +
+        "<ol style='width:300px'><li>ID: " + oCliente.id_cliente + "</li><li>Direccion: " + oCliente.direccion + "</li><li>Telefono: " + oCliente.telefono + "</li><li>Hora Inicial: " + oCliente.hora_inicial + "</li><li>Hora Final: " + oCliente.hora_final + "</li></ol><img src='" + oCliente.foto_url + "'width='150px' height='150px'>";
     return content;
+}
+
+function drawMarkersAllClientes(oUsuarios) {
+    clearMarkers();
+    for (var i = 0; i < oUsuarios.length; i++) {
+        oClientes = oUsuarios[i].oClientes;
+
+        color_map = oUsuarios[i].color_map;
+        color_sin_numeral = color_map.substring(1);
+        var pinColor = color_sin_numeral;
+        var pinImage = new google.maps.MarkerImage("http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|" + pinColor,
+            new google.maps.Size(21, 34),
+            new google.maps.Point(0, 0),
+            new google.maps.Point(10, 34));
+
+        for (var j = 0; j < oClientes.length; j++) {
+
+            var marker = new google.maps.Marker({
+                position: {
+                    lat: parseFloat(oClientes[j].latitud),
+                    lng: parseFloat(oClientes[j].longitud)
+                },
+                //label: ((j+1)).toString(),
+                animation: google.maps.Animation.DROP,
+                icon: pinImage,
+                title: "[" + oClientes[j].nombre + "] " + oClientes[j].direccion,
+                map: map
+            });
+
+            var infowindow = new google.maps.InfoWindow()
+            const content = infoMarker(oClientes[j]);
+            google.maps.event.addListener(marker, 'click', (function (marker, content, infowindow) {
+                return function () {
+                    infowindow.setContent(content);
+                    infowindow.open(map, marker);
+                };
+            })(marker, content, infowindow));
+            markers.push(marker);
+        }
+
+    }
+}
+
+function dibujarMarkers(oClientes, pinColor) {
+    var pinImage = new google.maps.MarkerImage("http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|" + pinColor,
+        new google.maps.Size(21, 34),
+        new google.maps.Point(0, 0),
+        new google.maps.Point(10, 34));
+
+    for (var j = 0; j < oClientes.length; j++) {
+        var marker = new google.maps.Marker({
+            position: {
+                lat: parseFloat(oClientes[j].latitud),
+                lng: parseFloat(oClientes[j].longitud)
+            },
+            label: ((j + 1)).toString(),
+            animation: google.maps.Animation.DROP,
+            title: "[" + oClientes[j].nombre + "] " + oClientes[j].direccion,
+            icon: pinImage,
+            map: map
+        });
+
+        var infowindow = new google.maps.InfoWindow()
+        const content = infoMarker(oClientes[j]);
+        google.maps.event.addListener(marker, 'click', (function (marker, content, infowindow) {
+            return function () {
+                infowindow.setContent(content);
+                infowindow.open(map, marker);
+            };
+        })(marker, content, infowindow));
+
+        markers.push(marker);
+        paths.push({ lat: parseFloat(oClientes[j].latitud), lng: parseFloat(oClientes[j].longitud) });
+    }
+    path = new google.maps.Polyline({
+        path: paths,
+        geodesic: true,
+        strokeColor: color_map,
+        strokeOpacity: 1.0,
+        strokeWeight: 2,
+    });
+    path.setMap(map);
+
 }
