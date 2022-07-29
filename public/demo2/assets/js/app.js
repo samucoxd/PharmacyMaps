@@ -14,7 +14,7 @@ var poligono = Array();
 
 var firstCircle = null;
 
-var url = 'https://terbol.info/ServicioMod04/api/actividad/group/by/usuario?parameters.fecha_ini=01%2F01%2F2022&parameters.fecha_fin=27%2F07%2F2022';
+var url = 'https://terbol.info/ServicioMod04/api/actividad/group/by/usuario?parameters.fecha_ini=01%2F01%2F2022&parameters.fecha_fin=28%2F07%2F2022';
 
 
 console.log("Start App");
